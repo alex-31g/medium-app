@@ -146,6 +146,27 @@ https://stackoverflow.com/questions/20711240/how-to-completely-remove-node-js-fr
 			/types
 ```
 
+# 4. Prettier - инструмент автоформатирования кода + Auto Import
 
+https://prettier.io/
 
+В редакторе VSCode переходим во вкладку расширения и устанавливаем **Prettier - Code formatter**.
+Далее идем в *Управление -> Параметры -> в поиск вводим «format on save» -> ставим галочку*
+
+Настройка Prettier: https://prettier.io/docs/en/options.html (доступные опции)
+
+В корне проекта создаем файл **src/.prettierrc**, в который добавляем необходимые для форматирования кода опции:
+```json
+{
+  "printWidth": 80,
+  "tabWidth": 2,
+  "semi": true,
+  "singleQuote": true,
+  "bracketSpacing": true
+}
+```
+
+В корне проекта создаем файл **src/.prettierignore**, в который добавляем файлы, который не нужно форматировать
+
+Для работы с TS также устанавливаем расширение **Auto Import** by steoates, которое облегчает импорт.
 		  
