@@ -176,3 +176,142 @@ https://prettier.io/
   
 Идея заключается в том, что разные типы IDE общаются с одним и тем же сервером, и когда вы что-то ввели, то благодаря LSP вам доступны такие функции как автокомплит, переход к функции, показ ошибок, авто импорт и прочее. Т.е. когда IDE нужно показать автокомплит - происходит запрос к специальному серверу. В ответе возвращаются необходимые данные, которые IDE уже может отобразить. 
 В VSCode для работы с typescript – LSP уже установлен.
+
+# 6. Модуль регистрации
+
+Наша задача создать страницу регистрации и авторизации. Вот как должны выглядеть эти страницы:
+http://angular.realworld.io/register
+http://angular.realworld.io/login
+
+В качестве бекэнда мы будем использовать публичный API: 
+https://conduit.productionready.io/api/articles/
+
+#### Базовая структура модуля:
+Так как эти страницы имеют много общего, для них мы создадим один модуль auth внутри src/app --> auth:
+
+```js
+/src
+	/app
+		/auth
+			auth.module.ts
+```
+Переходим в auth.module.ts и создаем там базовую структуру, которая должна существовать в каждом новом модуле:
+
+```js
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@NgModule({
+  imports: [CommonModule],
+})
+export class AuthModule {}
+```
+
+#### Базовая структура компонента:
+Внутри auth создаем директорию components, внутри которой, для нашей страницы регистрации создаем директорию src/app/auth/components/register, где будет храниться register.component:
+
+```js
+/src
+	/app
+		/auth
+			auth.module.ts
+			/components
+				/register
+					register.component.html
+					register.component.scss
+					register.component.ts
+```
+Переходим в register.component.ts и создаем там базовую структуру, которая должна существовать в каждом новом компоненте:
+
+```js
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'ma-register',
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.scss'],
+})
+export class RegisterComponent {}
+```
+Здесь стоит отметить, что строка `selector: 'ma-register'` содержит имя селектора с префиксом `ma`, что является сокращением от названия нашего приложения `medium-app`. Это правило создано для того, чтобы в коде различать сторонние библиотеки от наших собственных компонент.
+Например, в коде ниже мы видим, что внутри нашего компонента *ma-register* вложен сторонний компонент библиотеки *Angular material*:
+
+```html
+<ma-register>
+  <mat-slider value="1"></mat-slider>
+<ma-register>
+```
+
+#### Регистрация компонента внутри модуля:
+Чтобы начать пользоваться только что созданным компонентом register, его нужно зарегистрировать в модуле auth, которому он принадлежит.
+Переходим в auth.module.ts и выполняем следующее:
+- импортим register.component
+- регистрируем register.component в поле declarations
+
+```js
+import { RegisterComponent } from './components/register/register.component';
+@NgModule({
+  declarations: [RegisterComponent],
+})
+```
+
+#### Регистрация модуля внутри главного app модуля:
+Далее нужно зарегистрировать созданный нами auth.module.ts внутри app.module.ts. Для этого:
+- импортим auth.module
+- добавляем auth.module в массив imports
+
+```js
+import { AuthModule } from './auth/auth.module';
+@NgModule({
+  imports: [AuthModule],
+})
+export class AppModule {}
+```
+
+#### Регистрация роута
+Далее нужно описать роут, на котором будет рендериться register.component. Есть 2 способа.
+
+**Первый способ - регистрация роута компонента register внутри app-routing.module.ts**
+- импортим register.component
+- в существующий массив routes добавляем объект с описанием path и component
+- добавляем router-outlet в app.component.html
+
+```js
+import { RegisterComponent } from './auth/components/register/register.component';
+const routes: Routes = [
+  {
+    path: 'register',
+    component: RegisterComponent,
+  },
+];
+```
+У данного способа есть минус - если в будущем мы решим удалить модуль auth, который хранит компонент register, то нам прийдется делать очистку снаружи его, то-есть в файле app-routing.module.ts. Чтобы этого избежать, лучше использовать второй способ. 
+
+**Второй способ - регистрация роута компонента register внутри его родителя - модуля auth.module.ts**
+- импортим Routes, RouterModule
+- импортим register.component
+- создаем массив routes в который добавляем объект с описанием path и component
+- импортим созданный роут с помощью RouterModule.forChild() внутрь передавая массив routes
+- добавляем router-outlet в app.component.html
+
+```js
+import { Routes, RouterModule } from '@angular/router';
+import { RegisterComponent } from './components/register/register.component';
+const routes: Routes = [
+  {
+    path: 'register',
+    component: RegisterComponent,
+  },
+];
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+})
+```
+
+**router-outlet**
+Два вышеописанных способа должны работать в связке с router-outlet, который позволяет рендерить страницы.
+Для этого в app.component.html помещаем следующее:
+
+```html
+<router-outlet></router-outlet>
+```
