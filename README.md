@@ -179,11 +179,12 @@ https://prettier.io/
 
 # 6. Модуль регистрации
 
-Наша задача создать страницу регистрации и авторизации. Вот как должны выглядеть эти страницы:
-http://angular.realworld.io/register
+Наша задача создать страницу регистрации и авторизации.  
+Вот как должны выглядеть эти страницы:
+http://angular.realworld.io/register  
 http://angular.realworld.io/login
 
-В качестве бекэнда мы будем использовать публичный API: 
+В качестве бекэнда мы будем использовать публичный API:   
 https://conduit.productionready.io/api/articles/
 
 #### Базовая структура модуля:
@@ -308,7 +309,7 @@ const routes: Routes = [
 })
 ```
 
-**router-outlet**
+**router-outlet**    
 Два вышеописанных способа должны работать в связке с router-outlet, который позволяет рендерить страницы.
 Для этого в app.component.html помещаем следующее:
 
